@@ -1,0 +1,11 @@
+version = 0.1
+[default]
+[default.deploy]
+[default.deploy.parameters]
+stack_name = "shoeScraperBalenciaga"
+s3_bucket = "aws-sam-cli-managed-default-samclisourcebucket-fdh6tg6rzpg0"
+s3_prefix = "shoeScraperBalenciaga"
+region = "us-east-1"
+confirm_changeset = true
+capabilities = "CAPABILITY_IAM"
+image_repositories = ["HelloWorldFunction=814180570813.dkr.ecr.us-east-1.amazonaws.com/shoescraperbalenciaga4d78b15f/helloworldfunction19d43fc4repo"]
