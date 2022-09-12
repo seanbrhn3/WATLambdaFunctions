@@ -1,0 +1,11 @@
+version = 0.1
+[default]
+[default.deploy]
+[default.deploy.parameters]
+stack_name = "sage-make-upload-image"
+s3_bucket = "aws-sam-cli-managed-default-samclisourcebucket-fdh6tg6rzpg0"
+s3_prefix = "sage-make-upload-image"
+region = "us-east-1"
+confirm_changeset = true
+capabilities = "CAPABILITY_IAM"
+image_repositories = ["SageMakerImageUploadFunction=814180570813.dkr.ecr.us-east-1.amazonaws.com/sagemakeuploadimage50690523/sagemakerimageuploadfunctionb815decbrepo"]
