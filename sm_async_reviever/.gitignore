@@ -241,6 +241,4 @@ $RECYCLE.BIN/
 
 */build/*
 
-.DS_Store
-
 # End of https://www.gitignore.io/api/osx,linux,python,windows,pycharm,visualstudiocode

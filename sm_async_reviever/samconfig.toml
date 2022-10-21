@@ -1,0 +1,11 @@
+version = 0.1
+[default]
+[default.deploy]
+[default.deploy.parameters]
+stack_name = "smAsyncReciever"
+s3_bucket = "aws-sam-cli-managed-default-samclisourcebucket-fdh6tg6rzpg0"
+s3_prefix = "smAsyncReciever"
+region = "us-east-1"
+confirm_changeset = true
+capabilities = "CAPABILITY_IAM"
+image_repositories = ["AsynFunction=814180570813.dkr.ecr.us-east-1.amazonaws.com/smasyncreciever72a260a0/asynfunction80a09c15repo"]

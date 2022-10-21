@@ -1,0 +1,21 @@
+{
+    "Messages": [
+        {
+            "MessageId": "ed6fb5e4-6702-4f6d-b159-a799d1593f9f",
+            "ReceiptHandle": "AQEBGmmRw+yU/pHn1G8mudLqYgkWpERBCt70SegKKXls6i+7zuQ805bQ6oIMG7tXzZnAbfdUKY7r19G1RjKxJZCZLHttr41QLgJTg9Taac4MqCz12Zj/u5/hdjTag/gttiKXmQoWp6CCXody1A/YIdTaCLfIxi5xjdW4dxhLJBNUq2lhcEeNDDCsANTNdoYJLCbLMjZHNUAxIuv/c1KCV3/UrzeaVH3amUOJMwuTK5fSGlP1ml0dPjUpm5lU1SZXWCpP04qxOxNrwj4I7j9piK6rPo3+si6b4QdI3jRcE/eW8h7WEMRdNaAWvc3IV6UdQcMOJ1VV2FPUDhYOAMM5tySXn78nndpeMLmltJzQNGXhw4rRXy9lwfeOhXzBk0g4WvNmXDbysN8fiV1yAnjrh5Wq4g==",
+            "MD5OfBody": "12c88f89867ed25c17beed6df3415ef3",
+            "Body": "{\"version\":\"1.0\",\"timestamp\":\"2022-09-27T05:04:41.462Z\",\"requestContext\":{\"requestId\":\"249dd116-76e1-49cd-88da-8a1b370fb78e\",\"functionArn\":\"arn:aws:lambda:us-east-1:814180570813:function:sage-make-upload-image-SageMakerImageUploadFunctio-fMHEwryeJo2v:$LATEST\",\"condition\":\"Success\",\"approximateInvokeCount\":1},\"requestPayload\":{},\"responseContext\":{\"statusCode\":200,\"executedVersion\":\"$LATEST\"},\"responsePayload\":{\"statusCode\": 200, \"headers\": {\"Content-Type\": \"*/*\", \"Access-Control-Allow-Origin\": \"*\"}, \"body\": \"Your shoe is: \\\"adidas Yeezy Boost  OG Light Brown\\\"\", \"isBase64Encoded\": false}}"
+        }
+    ],
+    "ResponseMetadata": {
+        "RequestId": "9bd99300-1569-5c7d-b49b-c8ac99d3584b",
+        "HTTPStatusCode": 200,
+        "HTTPHeaders": {
+            "x-amzn-requestid": "9bd99300-1569-5c7d-b49b-c8ac99d3584b",
+            "date": "Tue, 27 Sep 2022 05:30:34 GMT",
+            "content-type": "text/xml",
+            "content-length": "1726"
+        },
+        "RetryAttempts": 0
+    }
+}

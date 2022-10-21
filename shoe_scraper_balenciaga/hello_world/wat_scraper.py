@@ -86,7 +86,7 @@ class WATScrper:
         search_url = 'https://www.google.com/search?q=' + dirs + '&source=lnms&tbm=isch'
         print(f"Grabbing images for {dirs}")
         options = selenium.webdriver.ChromeOptions()
-        options.add_argument('--headless')  # Chrome will operate in the background and won't open a window
+        #options.add_argument('--headless')  # Chrome will operate in the background and won't open a window
         options.add_argument('--no-sandbox')
         options.binary_location = '/opt/chrome/chrome'
         options.add_experimental_option("excludeSwitches", ['enable-automation'])
