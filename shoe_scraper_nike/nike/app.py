@@ -1,5 +1,5 @@
 import json
-from wat_scraper import WATScrper
+from wat_scraper import WATScraper
 
 def lambda_handler(event, context):
  # new_releases = WATScrper("https://www.nike.com/w/new-mens-shoes-3n82yznik1zy7ok","product-grid__items css-yj4gxb css-r6is66 css-1tvazw1 css-1oud6ob")
@@ -11,9 +11,11 @@ def lambda_handler(event, context):
     # nike = WATScrper("https://www.nike.com/w/mens-shoes-nik1zy7ok","product-grid__items css-yj4gxb css-r6is66 css-1tvazw1 css-1oud6ob")
     # nike.scrape_shoes()
 
-    jordans = WATScrper("https://www.nike.com/w/mens-jordan-shoes-37eefznik1zy7ok","product-grid__items css-hvew4t")
+    jordans = WATScraper("https://www.nike.com/w/mens-jordan-shoes-37eefznik1zy7ok","product-grid__items css-hvew4t")
 
-    bunches = WATScrper("https://www.nike.com/w/shoes-y7ok","product-grid__items css-hvew4t")
+    # product-card product-grid__card  css-c2ovjx
+    # Heplful reference when looking at classes with spaces: https://stackoverflow.com/questions/49613594/cant-find-element-by-class-selenium-amazon
+    bunches = WATScraper("https://www.nike.com/w/shoes-y7ok","css-c2ovjx")
 
     #jordans.scrape_shoes()
     bunches.scrape_shoes()
@@ -25,3 +27,4 @@ def lambda_handler(event, context):
             }
         ),
     }
+print(lambda_handler(None,None))
