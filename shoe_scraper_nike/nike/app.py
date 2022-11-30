@@ -1,6 +1,6 @@
 import json
 from wat_scraper import WATScraper
-
+#https://stackoverflow.com/questions/62999427/how-to-webscrape-all-shoes-on-nike-page-using-python
 def lambda_handler(event, context):
  # new_releases = WATScrper("https://www.nike.com/w/new-mens-shoes-3n82yznik1zy7ok","product-grid__items css-yj4gxb css-r6is66 css-1tvazw1 css-1oud6ob")
     # new_releases.scrape_shoes()

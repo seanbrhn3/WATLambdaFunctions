@@ -1,128 +1,188 @@
-<form id="user_info">
-  <label>Email</label>
-  <input type="text" placeholder="email">
-  <label>Phone Number</label>
-  <input type="text" placeholder="phone number">
-  <button type="submit">Sumbit</button>
-</form>
-<div id="app"></div>
-
-<form id="upload">
-	<label for="file">File to upload</label>
-	<input type="file" id="file" accept="image/*">
-	<button>Upload</button>
-</form>
+<!DOCTYPE html>
+<div id="file">
+ <input type="file" id="fileUpload">
+</div>
+</br>
+       
+<button id="submit" class="sqs-block-button-element--medium sqs-button-element--primary sqs-block-button-element" data-initialized="true" onclick="s3upload()">Submit</button>
 
 
-<script>
-  
-       class EasyHTTP {
 
-       // Make an HTTP PUT Request
-       async put(url, data) {
 
-        // Awaiting fetch which contains method,
-        // headers and content-type and body
-        const response = await fetch(url, {
-          method: 'PUT',
-               "headers":{
-                "Content-Type": "image/jpeg",
-                 "Accept":"*/*",
-            },
-          body: JSON.stringify(data)
+
+<progress id="progress"max=”100” value=”0”></progress>
+
+<div id="name"></div>
+<div id="image"></div>
+<div id="links"></div>
+
+
+
+<script src="https://sdk.amazonaws.com/js/aws-sdk-2.410.0.min.js"></script>
+<script type="text/javascript" src="https://code.jquery.com/jquery-3.2.1.min.js"></script>
+<script type="text/javascript">
+//Bucket Configurations
+var bucketName = "visionprocessing";
+var bucketRegion = "us-east-1";
+var IdentityPoolId = "us-east-1:036728e2-dd53-4e94-8f4f-e6b1fcef4cb9";
+
+ AWS.config.update({
+                region: bucketRegion,
+                credentials: new AWS.CognitoIdentityCredentials({
+                    IdentityPoolId: IdentityPoolId
+                })
+            });
+
+            var s3 = new AWS.S3({
+                params: {Bucket: bucketName}
         });
-
-        // Awaiting response.json()
-        const resData = await response.json();
-
-        // Return response data
-        return resData;
-      }
-         
-       // Make an HTTP GET Request
-       async get(url) {
-
-        // Awaiting fetch which contains method,
-        // headers and content-type and body
-        const response = await fetch(url, {
-          method: 'GET',
-               "headers":{
-                "Content-Type": "application/json",
-                 "Accept":"*/*",
-            }
-        });
-
-        // Awaiting response.json()
-        const resData = await response.json();
-
-        // Return response data
-        return resData;
-      }
-         
-         
-    }
-		// Get the form and file field
-		let form = document.querySelector('#upload');
-		let file = document.querySelector('#file');
-		let app = document.querySelector('#app');
-
-		/**
-		 * Log the uploaded file to the console
-		 * @param {event} Event The file loaded event
-		 */
-		function logFile (event) {
-			let str = event.target.result;
-			let img = document.createElement('img');
-			img.src = str;
-			app.append(img);
-			console.log(str.replace("data:image/jpeg;base64,", ""));
-            const http = new EasyHTTP;
-            // Update Post
-            http.put(
-            'https://2sy9o45xo0.execute-api.us-east-1.amazonaws.com/prod/visionprocessing/postmantest4.jpg',
-                 str)
-
-            // Resolving promise for response data
-            .then(data => console.log(data))
-
-            // Resolving promise for error
-            .catch(err => console.log(err));
-          
-            http.get(
-            'https://zdnlp0vdld.execute-api.us-east-1.amazonaws.com/Prod/sage')
-
-            // Resolving promise for response data
-            .then(data => console.log(data))
-
-            // Resolving promise for error
-            .catch(err => console.log(err));
-          
-		}
-
-		/**
-		 * Handle submit events
-		 * @param  {Event} event The event object
-		 */
-		function handleSubmit (event) {
-
-			// Stop the form from reloading the page
-			event.preventDefault();
-
-			// If there's no file, do nothing
-			if (!file.value.length) return;
-
-			// Create a new FileReader() object
-			let reader = new FileReader();
-
-			// Setup the callback event to run when the file is read
-			reader.onload = logFile;
-
-			// Read the file
-			var image = reader.readAsDataURL(file.files[0]);
-            // Instantiating new EasyHTTP class
-
-		}
-
-		// Listen for submit events
-		form.addEventListener('submit', handleSubmit);
 </script>
+<script type="text/javascript">
+  
+let form = document.querySelector('#name');
+let file = document.querySelector('#image');
+let app = document.querySelector('#links');
+class EasyHTTP {    
+  // Make an HTTP GET Request
+  async get(url) {
+
+   // Awaiting fetch which contains method,
+   // headers and content-type and body
+   const response = await fetch(url, {
+     method: 'GET',
+          "headers":{
+           "Content-Type": "application/json",
+            "Accept":"*/*",
+       }
+   });
+
+   // Awaiting response.json()
+   const resData = await response.json();
+
+   // Return response data
+   return resData;
+ }  
+
+ async post(url,data) {
+    // Awaiting fetch which contains method,
+    // headers and content-type and body
+    const response = await fetch(url, {
+      method: 'POST',
+          "headers":{
+            "Content-Type": "application/json",
+            "Accept":"*/*",
+        },
+        body: JSON.stringify(data)
+    });
+
+    // Awaiting response.json()
+    const resData = await response.json();
+
+    // Return response data
+    return resData;
+    } 
+}
+function s3upload() {
+   var files = document.getElementById('fileUpload').files;
+   if (files) 
+   {
+     var file = files[0];
+     var fileName = file.name;
+     var filePath = "postmantest4.jpg";
+     var fileUrl = 'https://' + bucketRegion + '.amazonaws.com/my-    first-bucket/' +  filePath;
+     
+      var params = {
+  Body: file, 
+  Bucket: "visionprocessing", 
+  Key: filePath
+ };
+ s3.putObject(params, function(err, data) {
+   if (err) console.log(err, err.stack); // an error occurred
+   else     console.log(data);  
+   alert("Successfully Uploaded!!!")         // successful response
+ }).on('httpUploadProgress', function (progress) {
+        var uploaded = parseInt((progress.loaded * 100) / progress.total);
+        $("progress").attr('value', uploaded);
+      });
+   }
+   const http = new EasyHTTP;
+http.get(
+'https://zdnlp0vdld.execute-api.us-east-1.amazonaws.com/Prod/sage')
+
+// Resolving promise for response data
+.then(data => {
+  let name = document.getElementById("name");
+  let image = document.getElementById("image");
+  let all_links = document.getElementById("links");
+  name.append(data.name);
+
+  const img = new Image();
+    img.crossOrigin = 'Anonymous';
+    img.onload = () => {
+      const canvas = document.createElement('canvas');
+      const ctx = canvas.getContext('2d');
+      let dataURL;
+      canvas.height = img.naturalHeight;
+      canvas.width = img.naturalWidth;
+      // ctx.drawImage(img, 0, 0);
+    }
+    img.src= "data:image/jpeg;base64,"+data.image;
+    image.appendChild(img);
+
+  var links = data.links;
+  for(var link in links){
+    if(typeof links[link][1] === "undefined" || typeof links[link][0] === "undefined" ){
+        console.log("Ignore");
+    }else{
+        a = document.createElement("a");
+        var img_text = new Image();
+        img_text.height = 100;
+        img_text.width = 100;
+        img_text.name = links[link][0];
+        img_text.src= "data:image/jpeg;base64,"+links[link][1];
+        a.href = links[link][0];
+        a.appendChild(img_text);
+        all_links.append(a);
+    }
+  }
+
+  
+})
+
+// Resolving promise for error
+.catch(err => console.log(err));
+
+
+};
+</script>
+
+<script type="text/javascript">
+  function upload_message(){
+    console.log("HERE");
+     name = document.getElementById("name");
+     email = document.getElementById("email");
+     phone = document.getElementById("phone");
+     message = document.getElementById("message");
+ 
+     full_message = {
+         "name": name.value,
+         "email":email.value,
+         "phone":phone.value,
+         "message":message.value
+     }
+     full_message = JSON.stringify(full_message);
+     console.log(full_message);
+     const http = new EasyHTTP();
+     http.post(
+             'https://e7oj9wtrw3.execute-api.us-east-1.amazonaws.com/Prod/uploadform',
+                  full_message)
+ 
+             // Resolving promise for response data
+             .then(data => console.log(data))
+ 
+             // Resolving promise for error
+             .catch(err => console.log(err));
+  }
+ 
+ </script>
+ </html>

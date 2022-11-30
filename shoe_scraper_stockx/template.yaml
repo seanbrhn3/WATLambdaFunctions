@@ -3,43 +3,44 @@ Transform: AWS::Serverless-2016-10-31
 Description: >
   python3.9
 
-  Sample SAM Template for shoe_scraper_nike
+  Sample SAM Template for shoe_scraper_stockx
 
 # More info about Globals: https://github.com/awslabs/serverless-application-model/blob/master/docs/globals.rst
 Globals:
   Function:
     Timeout: 3
+    Tracing: Active
+  Api:
+    TracingEnabled: True
 
 Resources:
-  ShoeScraperNikeFunction:
+  stockXFunction:
     Type: AWS::Serverless::Function # More info about Function Resource: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#awsserverlessfunction
     Properties:
       PackageType: Image
       Architectures:
         - x86_64
       Events:
-        Scheduler:
-          Type: Schedule
+        stockX:
+          Type: Api # More info about API Event Source: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#api
           Properties:
-              Schedule: cron(0 9 * * ? *)
-              Name: Scheduled-Scraper-Run
-              Description: Run shoe scraper at specified time
-              Enabled: false
+            Path: /stockX
+            Method: get
     Metadata:
       Dockerfile: Dockerfile
-      DockerContext: ./nike
+      DockerContext: ./stockX
       DockerTag: python3.9-v1
 
 Outputs:
   # ServerlessRestApi is an implicit API created out of Events key under Serverless::Function
   # Find out more about other implicit resources you can reference within SAM
   # https://github.com/awslabs/serverless-application-model/blob/master/docs/internals/generated_resources.rst#api
-  NikeApi:
-    Description: "API Gateway endpoint URL for Prod stage for Hello World function"
-    Value: !Sub "https://${ServerlessRestApi}.execute-api.${AWS::Region}.amazonaws.com/Prod/nike/"
-  ShoeScraperNikeFunction:
-    Description: "Hello World Lambda Function ARN"
-    Value: !GetAtt ShoeScraperNikeFunction.Arn
-  ShoeScraperNikeFunctionIamRole:
-    Description: "Implicit IAM Role created for Hello World function"
-    Value: !GetAtt ShoeScraperNikeFunctionRole.Arn
+  stockXApi:
+    Description: "API Gateway endpoint URL for Prod stage for stockX World function"
+    Value: !Sub "https://${ServerlessRestApi}.execute-api.${AWS::Region}.amazonaws.com/Prod/stockX/"
+  stockXFunction:
+    Description: "stockX Lambda Function ARN"
+    Value: !GetAtt stockXFunction.Arn
+  stockXFunctionIamRole:
+    Description: "Implicit IAM Role created for stockX World function"
+    Value: !GetAtt stockXFunctionRole.Arn

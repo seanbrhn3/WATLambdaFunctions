@@ -5,7 +5,8 @@ import boto3
 import logging
 import re
 import base64
-
+import pprint
+#https://www.youtube.com/watch?v=DqtlR0y0suo For scraping shoes !!!!!
 logging.basicConfig(level=logging.INFO)
 S3 = boto3.client("s3")
 
@@ -49,7 +50,7 @@ def lambda_handler(event, context):
  # This will return the page # in S3 where you can locate the shoe   
 def shoe_recognition():
     try:
-        ENDPOINT_NAME = 'IC-data-1575382941' # Sagemaker endpoint
+        ENDPOINT_NAME = 'image-classification-2022-11-13-19-50-04-706' #'IC-data-1575382941' # Sagemaker endpoint
         runtime= boto3.client('runtime.sagemaker')
         # Downloading picture to upload to sagemaker nueral net
         with open("/tmp/postmantest4.jpg","wb") as data:
@@ -123,9 +124,17 @@ def download_image(image_name):
         logging.error(f"[!] error loading image {e}")
 
 def generate_links(name):
-    stockx = f"https://stockx.com/{name}"
-    goat = f"https://www.goat.com/sneakers/{name}"
-    flight_club = f"https://www.flightclub.com/{name}"
-    dtlr_men = f"https://www.dtlr.com/collections/men/products/{name}"
-    dtlr_women = f"https://www.dtlr.com/collections/women/products/{name}"
-    return [stockx,goat,flight_club,dtlr_men,dtlr_women]
+    # Dictionary matches up the proper image so just return an array and the link will go with the image
+    image_links = {}
+    image_links["dtlr.jpeg"] = [f"https://www.dtlr.com/pages/search-results?q={name}"]
+    image_links["flightClub.jpeg"] = [f"https://www.flightclub.com/catalogsearch/result?query={name}"]
+    image_links["goat.jpeg"] = [f"https://www.goat.com/search?query={name}"]
+    image_links["StockXLogoBig.jpeg"] = [f"https://stockx.com/search?s={name}"] 
+    
+    all_links = []
+    for name in image_links.keys():
+        brand_arr = image_links[name]
+        image = download_image(name)
+        brand_arr.append(image)
+        all_links.append(brand_arr)
+    return all_links
