@@ -1,0 +1,1 @@
+create table shoe-meta-data 

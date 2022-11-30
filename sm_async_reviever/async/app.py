@@ -1,3 +1,4 @@
+from curses import start_color
 import json
 import boto3
 # SQS Documentation: https://boto3.amazonaws.com/v1/documentation/api/latest/reference/services/sqs.html#SQS.Client.receive_message
@@ -40,3 +41,11 @@ def check_queue(url):
         return  "No messages in queue"
     except Exception as e:
         return f"[!] error retrieving message {e}"
+
+def generate_links(name):
+    stockx = f"https://stockx.com/{name}"
+    goat = f"https://www.goat.com/sneakers/{name}"
+    flight_club = f"https://www.flightclub.com/{name}"
+    dtlr_men = f"https://www.dtlr.com/collections/men/products/{name}"
+    dtlr_women = f"https://www.dtlr.com/collections/women/products/{name}"
+    return [stockx,goat,flight_club,dtlr_men,dtlr_women] 

@@ -15,22 +15,23 @@ from selenium.webdriver.common.keys import Keys
 from webdriver_manager.chrome import ChromeDriverManager
 from selenium.webdriver.chrome.service import Service
 import time
-from  mysql_client import SQLClient
 
 urllib3.disable_warnings(InsecureRequestWarning)
 
 """
     WATScraper is used to parse sneaker pages like Nike, and adidas to collect shoe images and their meta data such as
     price, name, description and brand.
-    
+
     link: Link to sneaker page
-    
+
     tile_class: class of the element holding the shoe information. To see what is looks like go to the link, inspect the page
     and search for the tile_class.
-    
+
     element: <div>, <option>, <li>; Element name used to make searching easier in BeautifulSoup 
-    
+
 """
+
+
 class WATScraper:
     gfs = google_images_download.googleimagesdownload()
     client = boto3.client("s3")
@@ -38,13 +39,13 @@ class WATScraper:
     image_links = []
     link = None
     pool = urllib3.PoolManager()
-      # Random headers the make the site believe we're a real browser
-    HEADERS =  {
-            "User-Agent": "Mozilla/5.0 (X11; CrOS x86_64 12871.102.0) AppleWebKit/537.36 (KHTML, "
-                          "like Gecko) Chrome/81.0.4044.141 Safari/537.36"
-        }
+    # Random headers the make the site believe we're a real browser
+    HEADERS = {
+        "User-Agent": "Mozilla/5.0 (X11; CrOS x86_64 12871.102.0) AppleWebKit/537.36 (KHTML, "
+                      "like Gecko) Chrome/81.0.4044.141 Safari/537.36"
+    }
 
-    def __init__(self, link,tile_class,element=None):
+    def __init__(self, link, tile_class, element=None):
         self.link = link
         self.element = element
         self.tile_class = tile_class
@@ -57,38 +58,28 @@ class WATScraper:
             return "link is null"
         try:
             sneaker_head_object = BeautifulSoup(markup=sneaker_head.content, features="html.parser")
-            if self.element is None: # Element is used if there are multiple elements like p, and div with the same class name
+            if self.element is None:  # Element is used if there are multiple elements like p, and div with the same class name
                 sneaker_head_image = sneaker_head_object.find_all(class_=self.tile_class)
             else:
-                sneaker_head_image = sneaker_head_object.find_all(self.element,class_=self.tile_class)
-                
-            sql_client = SQLClient()
+                sneaker_head_image = sneaker_head_object.find_all(self.element, class_=self.tile_class)
+
             print(f"found {len(sneaker_head_image)} shoes")
             # sneaker_head_image is an array of elements within the tile
             for sneaker in sneaker_head_image:
-                sneak_data = {}
-                link = sneaker.find('a').get("href")
-                title = sneaker.find(class_="product-card__title")
-                for name in title:
-                    title = name
-                price = self.get_price(title)
-                title = title.replace(f"${price}","")
-                sneak_data["title"] = title
-                sneak_data["link"] = link 
-                sneak_data["price"] = price
-                sneak_data["s3_prefix"] = title.replace(" ", "-")+"/"
-                sql_client.insert(sneak_data)
-                self.client.put_object(Bucket="sagemakertestwat-dev", Key=title)
+                titles = sneaker.find_all("p")
+                title = titles[0].text
+                print(title)
+                #return
+                #self.client.put_object(Bucket="sagemakertestwat-dev", Key=title)
                 # Adds image to directory
-                images_found = self.download_google_staticimages(title)
-                return f"{images_found} images collected"
+                #images_found = self.download_google_staticimages(title)
+                #return f"{images_found} images collected"
         except Exception as e:
             print(f"Unable to find shoe names: {e}")
 
-
-    def get_price(self,sneaker):
+    def get_price(self, sneaker):
         price_index = sneaker.index("$")
-        price_string = sneaker[price_index+1:]
+        price_string = sneaker[price_index + 1:]
         price = ""
         for char in price_string:
             if char.isnumeric() or char == '.':
@@ -96,7 +87,7 @@ class WATScraper:
             else:
                 break
         return price
-    
+
     def options(self):
         options = selenium.webdriver.ChromeOptions()
         options.add_argument('--headless')  # Chrome will operate in the background and won't open a window
@@ -117,9 +108,10 @@ class WATScraper:
         options.add_argument("--disable-dev-tools")
         options.add_argument("--no-zygote")
         options.add_argument("--remote-debugging-port=9222")
-        prefs = {"download.default_directory" : "/tmp/"}
-        options.add_experimental_option("prefs",prefs) # This changes the download.default_directory to /tmp/
+        prefs = {"download.default_directory": "/tmp/"}
+        options.add_experimental_option("prefs", prefs)  # This changes the download.default_directory to /tmp/
         return options
+
     """
     function name: download_google_staticimage,
     purpose: use the google_images_download library to download the she image passed in the scrape shoes function.
@@ -131,8 +123,9 @@ class WATScraper:
         dirs = dirs.replace(" ", "-")
         search_url = 'https://www.google.com/search?q=' + dirs + '&source=lnms&tbm=isch'
         print(f"Grabbing images for {dirs}")
-        option=self.options()
-        browser = selenium.webdriver.Chrome(service=Service(ChromeDriverManager(path="/tmp/").install()), options=option)
+        option = self.options()
+        browser = selenium.webdriver.Chrome(service=Service(ChromeDriverManager(path="/tmp/").install()),
+                                            options=option)
         browser.get(search_url)
         time.sleep(1)
         print(f'Getting you  a lot of images. This may take a few moments...')
@@ -201,14 +194,14 @@ class WATScraper:
                     res = requests.get(url, stream=True)
                     if res.status_code == 200:
                         dirs = dirs.rstrip().split("\n")
-                        print("[+] Doowloading ",dirs)
+                        print("[+] Doowloading ", dirs)
                         dirs = dirs[0]
                         dirs = dirs.replace(" ", "_")
                         # Copy Image
                         filename = dirs + str(count) + ".jpg"
                         # Make directory
                         print(f"[+] Writing file to /tmp/{filename}")
-                        filename = "/tmp/"+filename
+                        filename = "/tmp/" + filename
                         with open(filename, 'wb') as f:
                             shutil.copyfileobj(res.raw, f)
                             # shutil.copyfileobj(res.raw, f)
@@ -223,3 +216,12 @@ class WATScraper:
         browser.close()
         return count
 
+
+def main():
+    for i in range(1,25):
+        stockX = WATScraper(f"https://stockx.com/sneakers?page={i}","css-pnc6ci")
+        print(stockX.scrape_shoes())
+
+
+if __name__ == '__main__':
+    main()

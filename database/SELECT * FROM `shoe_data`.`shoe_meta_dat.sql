@@ -1,0 +1,1 @@
+SELECT * FROM `shoe_data`.`shoe_meta_data` LIMIT 1000;

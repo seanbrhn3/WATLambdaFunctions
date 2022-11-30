@@ -1,0 +1,37 @@
+
+    #file {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+  }
+  #submit {
+  	   display: flex;
+      justify-content: center;
+      align-items: center;
+
+  }
+  
+  #progress {
+  	  display: flex;
+      justify-content: center;
+      align-items: center;
+  }
+  #name {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+  }
+
+  #image {
+       display: flex;
+      justify-content: center;
+      align-items: center;
+  }
+
+  #links {
+       display: flex;
+      justify-content: center;
+      align-items: center;
+  }
+ 

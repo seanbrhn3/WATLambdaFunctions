@@ -1,6 +1,6 @@
 from distutils.log import ERROR
 import json
-from wat_scraper import WATScrper
+from wat_scraper import WATScraper
 import logging
 """
 All scrapers need to handle pagination
@@ -13,7 +13,8 @@ def pagination():
 
 def lambda_handler(event, context):
     try:
-        balenciaga = WATScrper("https://www.balenciaga.com/us/men/shoes", "c-product__name")
+        # The second parameter should be the tile class for the
+        balenciaga = WATScraper("https://www.balenciaga.com/us/men/shoes", "l-productgrid__item")
         shoes_found = balenciaga.scrape_shoes()
     except Exception as e:
         logging.error(f"[!] Error scraping shoes: {e}")
@@ -29,5 +30,4 @@ def lambda_handler(event, context):
     }
   
 
-
-
+print(lambda_handler(None,None))

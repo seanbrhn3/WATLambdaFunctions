@@ -1,0 +1,128 @@
+<form id="user_info">
+    <label>Email</label>
+    <input type="text" placeholder="email">
+    <label>Phone Number</label>
+    <input type="text" placeholder="phone number">
+    <button type="submit">Sumbit</button>
+  </form>
+  <div id="app"></div>
+  
+  <form id="upload">
+      <label for="file">File to upload</label>
+      <input type="file" id="file" accept="image/*">
+      <button>Upload</button>
+  </form>
+  
+  
+  <script>
+    
+         class EasyHTTP {
+  
+         // Make an HTTP PUT Request
+         async put(url, data) {
+  
+          // Awaiting fetch which contains method,
+          // headers and content-type and body
+          const response = await fetch(url, {
+            method: 'PUT',
+                 "headers":{
+                  "Content-Type": "image/jpeg",
+                   "Accept":"*/*",
+              },
+            body: JSON.stringify(data)
+          });
+  
+          // Awaiting response.json()
+          const resData = await response.json();
+  
+          // Return response data
+          return resData;
+        }
+           
+         // Make an HTTP GET Request
+         async get(url) {
+  
+          // Awaiting fetch which contains method,
+          // headers and content-type and body
+          const response = await fetch(url, {
+            method: 'GET',
+                 "headers":{
+                  "Content-Type": "application/json",
+                   "Accept":"*/*",
+              }
+          });
+  
+          // Awaiting response.json()
+          const resData = await response.json();
+  
+          // Return response data
+          return resData;
+        }
+           
+           
+      }
+          // Get the form and file field
+          let form = document.querySelector('#upload');
+          let file = document.querySelector('#file');
+          let app = document.querySelector('#app');
+  
+          /**
+           * Log the uploaded file to the console
+           * @param {event} Event The file loaded event
+           */
+          function logFile (event) {
+              let str = event.target.result;
+              let img = document.createElement('img');
+              img.src = str;
+              app.append(img);
+              console.log(str.replace("data:image/jpeg;base64,", ""));
+              const http = new EasyHTTP;
+              // Update Post
+              http.put(
+              'https://2sy9o45xo0.execute-api.us-east-1.amazonaws.com/prod/visionprocessing/postmantest4.jpg',
+                   str)
+  
+              // Resolving promise for response data
+              .then(data => console.log(data))
+  
+              // Resolving promise for error
+              .catch(err => console.log(err));
+            
+              http.get(
+              'https://zdnlp0vdld.execute-api.us-east-1.amazonaws.com/Prod/sage')
+  
+              // Resolving promise for response data
+              .then(data => console.log(data))
+  
+              // Resolving promise for error
+              .catch(err => console.log(err));
+            
+          }
+  
+          /**
+           * Handle submit events
+           * @param  {Event} event The event object
+           */
+          function handleSubmit (event) {
+  
+              // Stop the form from reloading the page
+              event.preventDefault();
+  
+              // If there's no file, do nothing
+              if (!file.value.length) return;
+  
+              // Create a new FileReader() object
+              let reader = new FileReader();
+  
+              // Setup the callback event to run when the file is read
+              reader.onload = logFile;
+  
+              // Read the file
+              var image = reader.readAsDataURL(file.files[0]);
+              // Instantiating new EasyHTTP class
+  
+          }
+  
+          // Listen for submit events
+          form.addEventListener('submit', handleSubmit);
+  </script>

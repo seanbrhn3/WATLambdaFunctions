@@ -1,19 +1,25 @@
+from email.mime import image
 import json
+from sys import prefix
 import boto3
 import logging
 import re
 import base64
-
+import pprint
+#https://www.youtube.com/watch?v=DqtlR0y0suo For scraping shoes !!!!!
 logging.basicConfig(level=logging.INFO)
 S3 = boto3.client("s3")
 
+# Invocation request type: X-Amz-Invocation-Type	method.request.header.InvocationType
+
 def lambda_handler(event, context):
     try:
-        # Predicted value of the shoe found in s3
+        # Predicted index of the shoe found in s3
         pred = shoe_recognition()
-        shoe_name, shoe_image = locate_shoe(pred)
+        shoe_name, shoe_image, links = locate_shoe(pred)
         shoe_info = {
             "name": shoe_name,
+            "links": links,
             "image": shoe_image
         }
         respone_body = {
@@ -43,13 +49,14 @@ def lambda_handler(event, context):
     
  # This will return the page # in S3 where you can locate the shoe   
 def shoe_recognition():
-        ENDPOINT_NAME = 'IC-data-1575382941' # Sagemaker endpoint
+    try:
+        ENDPOINT_NAME = 'image-classification-2022-11-13-19-50-04-706' #'IC-data-1575382941' # Sagemaker endpoint
         runtime= boto3.client('runtime.sagemaker')
         # Downloading picture to upload to sagemaker nueral net
-        with open("/tmp/postmantest3.jpg","wb") as data:
-            S3.download_fileobj("visionprocessing", "postmantest3.jpg", data)
+        with open("/tmp/postmantest4.jpg","wb") as data:
+            S3.download_fileobj("visionprocessing", "postmantest4.jpg", data)
 
-        with open("/tmp/postmantest3.jpg", 'rb') as f:
+        with open("/tmp/postmantest4.jpg", 'rb') as f:
             payload = f.read()
             payload = bytearray(payload)
         # Run image through nueral net to get the best result
@@ -62,69 +69,39 @@ def shoe_recognition():
 
         pred = result.index(max(result))
         return pred
- 
- # Finds the shoe based on the index given from shoe recognitions
-"""
- ex:
-        index = 50
-        max # of items per page = 1000
-        index/ max = 5 - page # to lookat
-        remainder = 0 index of that shoe at page 5
-        
-    1. Use NextToken to skip pages
-    2. Prefix all dir with '/'
+    except Exception as e:
+        return f"{e}"
     
+# Only searches for folders instead of content within them
+def list_folders(s3_client, bucket_name):
+    response = s3_client.list_objects_v2(Bucket=bucket_name, Prefix='', Delimiter='/')
+    for content in response.get('CommonPrefixes', []):
+        yield content.get('Prefix')
+ 
+"""
     Notes:
+        LOOK AT THIS FOR FILTERING: https://stackoverflow.com/questions/45601305/get-full-path-to-files-in-s3-using-boto3-nested-keys
         https://boto3.amazonaws.com/v1/documentation/api/latest/reference/services/s3.html#S3.Paginator.ListObjectsV2
     
 """
 def locate_shoe(pred):
-    # Set paginator to the max length of 1000
-    paginator = S3.get_paginator('list_objects_v2')
-    maxItems = 1000
-    pageSize = 1000
-    paginator_config = {
-        "MaxItems":maxItems,
-        "Pagesize":pageSize,
-    }
-    
-    # Page to look at
-    page = maxItems/pred
-    page = int(page)
-    logging.info(f"[+] Looking at page {page}")
-    
-    # The Remainder is the exact position of the shoe
-    index = maxItems%pred
-    logging.info(f"[+] Locating shoe at position: {index}")
-    # Formating shoe names to remove .jpg and remvove duplicates
-    count = 0
-    logging.info("[+] Collecting Shoe names...")
     try:
-        # Grab all the names of shoes in the S3 bucket
-        shoe_folders = paginator.paginate(Bucket="sagemakertestwat-dev",PaginationConfig=paginator_config)
-        next_page = None
-        while count < page+1:
-            for shoes_pagination in shoe_folders:
-                # Flip through each page to youo find the one the shoe is located in
-                if count == page:
-                    logging.info(f"[+] Collecting shoes on page {page}, looking for shoe at position {index}")
-                    position = index/len(shoes_pagination.get("Contents"))
-                    #  Now that you've found the shoes page return the position in on the page.
-                    image_name = shoes_pagination.get("Contents")[int(position)].get("Key")
-                    image_string = download_image(image_name)
-                    return image_name, image_string
-                # If shoe_folder returns a string its the starting token of the next position
-                if 'NextContinuationToken' in shoes_pagination.keys():
-                    next_page = shoes_pagination.get('NextContinuationToken')
-                    break
-                
-            paginator_config = {
-                "MaxItems":maxItems,
-                "Pagesize":pageSize,
-                'StartingToken':next_page
-            }
-            shoe_folders = paginator.paginate(Bucket="sagemakertestwat-dev",PaginationConfig=paginator_config)
-            count += 1
+        folders = list_folders(S3,"sagemakertestwat-dev")
+        count = 0
+        for folder in folders:
+            if count == pred:
+                object = S3.list_objects_v2(Bucket="sagemakertestwat-dev",Prefix=folder)
+                image_name = object.get('Contents')[0].get("Key")
+                image_string = download_image(image_name)
+                # Image names look like this Adidas-Yeezy-Boost-350-Low-V2-Beluga/Adidas-Yeezy-Boost-350-Low-V2-Beluga0.jpg
+                # So we need to remove everything from the '/' and after
+                remove_point = image_name.index("/")
+                image_name = image_name.replace(image_name[remove_point:],"")
+                if "-" not in image_name:
+                    image_name = image_name.replace(" ","-")
+                links = generate_links(image_name)
+                return image_name, image_string, links
+            count +=1
     except Exception as e:    
         return f"[!] Unable to retrieve shoe, error: {e}"
             
@@ -146,4 +123,18 @@ def download_image(image_name):
     except Exception as e:
         logging.error(f"[!] error loading image {e}")
 
-print(lambda_handler(None,None))
+def generate_links(name):
+    # Dictionary matches up the proper image so just return an array and the link will go with the image
+    image_links = {}
+    image_links["dtlr.jpeg"] = [f"https://www.dtlr.com/pages/search-results?q={name}"]
+    image_links["flightClub.jpeg"] = [f"https://www.flightclub.com/catalogsearch/result?query={name}"]
+    image_links["goat.jpeg"] = [f"https://www.goat.com/search?query={name}"]
+    image_links["StockXLogoBig.jpeg"] = [f"https://stockx.com/search?s={name}"] 
+    
+    all_links = []
+    for name in image_links.keys():
+        brand_arr = image_links[name]
+        image = download_image(name)
+        brand_arr.append(image)
+        all_links.append(brand_arr)
+    return all_links

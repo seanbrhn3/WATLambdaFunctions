@@ -1,0 +1,11 @@
+version = 0.1
+[default]
+[default.deploy]
+[default.deploy.parameters]
+stack_name = "shoe-scraper-nike"
+s3_bucket = "aws-sam-cli-managed-default-samclisourcebucket-fdh6tg6rzpg0"
+s3_prefix = "shoe-scraper-nike"
+region = "us-east-1"
+confirm_changeset = true
+capabilities = "CAPABILITY_IAM"
+image_repositories = ["ShoeScraperNikeFunction=814180570813.dkr.ecr.us-east-1.amazonaws.com/shoescrapernikeaba12310/shoescrapernikefunction085e45f9repo"]
