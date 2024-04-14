@@ -10,7 +10,7 @@ charset-normalizer==2.1.0
 cryptography==37.0.4
 google-images-download==2.8.0
 h11==0.13.0
-idna==3.3
+idna==3.7
 jmespath==1.0.1
 outcome==1.2.0
 pycparser==2.21
